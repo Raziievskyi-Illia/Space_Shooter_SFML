@@ -90,7 +90,10 @@ int main() {
 
     std::vector<sf::Sprite> hp;
 
-   // sf::Clock time; 
+    sf::Clock clock;
+    float timeSinceLastSpeedChange = 0.0f;
+    const float speedChangeInterval = 15.0f;
+
     
 
 
@@ -126,7 +129,11 @@ int main() {
     sound.setVolume(15.f);
 
    
-    
+    sf::SoundBuffer bf_hploss; 
+    bf_hploss.loadFromFile("hp_loss.wav"); 
+
+    sf::Sound sound_hploss; 
+    sound_hploss.setBuffer(bf_hploss); 
 
 
    
@@ -248,12 +255,19 @@ int main() {
             sf::Event event;
             text.setString(" Score : " + std::to_string(Score));
 
-            //sf::Time totalTime = time.getElapsedTime();
-            //float totalMilliseconds = totalTime.asMilliseconds();
-            //enemy_speed = 0.0001 * totalMilliseconds; 
+            sf::Time elapsed = clock.getElapsedTime();
+            float deltaTime = elapsed.asSeconds() - timeSinceLastSpeedChange;
+
+            if (deltaTime >= speedChangeInterval)
+            {
+               
+                enemy_speed += 0.3f; 
+                timeSinceLastSpeedChange = elapsed.asSeconds(); // Обновляем время последнего изменения
+            }
+            
 
 
-            switch (Score)
+           /* switch (Score)
             {
             case 160:
             {
@@ -283,7 +297,7 @@ int main() {
             }
             default:
                 break;
-            }
+            }*/
 
 
             if (std::rand() % 100 < 3) {
@@ -359,6 +373,7 @@ int main() {
                     hp.erase(hp.end()-1);
                     --HP;
                     it = enemies.erase(it);
+                    sound_hploss.play(); 
                 }
                 else {
                     ++it;
